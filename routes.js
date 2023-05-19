@@ -1,0 +1,1 @@
+var auth = require('./routes/auth');
