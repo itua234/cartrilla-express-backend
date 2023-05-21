@@ -1,3 +1,16 @@
+const Sequelize = require('sequelize');
+const dbConfig = require('../config/db-config');
+const sequelize = new Sequelize(
+    dbConfig.DATABASE, 
+    dbConfig.USER, 
+    dbConfig.PASSWORD, 
+    {
+        dialect: dbConfig.DIALECT,
+        host: dbConfig.HOST
+    }
+);
+const User = require('./user')(sequelize, Sequelize.DataTypes);
+const Address = require('./address')(sequelize, Sequelize.DataTypes);
 module.exports = (sequelize, DataTypes) => {
     const Order = sequelize.define('Order', {
         id: {
@@ -19,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
             unique: true
         },
         total: {
+            type: DataTypes.INTEGER,
+        },
+        amount_paid: {
             type: DataTypes.INTEGER,
         },
         subcharge: {
@@ -54,17 +70,16 @@ module.exports = (sequelize, DataTypes) => {
         },
     },{})
 
-    Order.associate = (models) => {
-        Order.belongsTo(models.User, {
-            onDelete: "CASCADE",
-            foreignKey: 'user_id',
-            targetKey: 'id'
-        });
-        Order.hasOne(models.Address, {
-            onDelete: "CASCADE",
-            foreignKey: 'order_id',
-            targetKey: 'id'
-        });
-    }
+    Order.belongsTo(User, {
+        onDelete: "CASCADE",
+        foreignKey: 'user_id',
+        targetKey: 'id'
+    });
+    Order.hasOne(Address, {
+        onDelete: "CASCADE",
+        foreignKey: 'order_id',
+        targetKey: 'id',
+        as: "address"
+    });
     return Order;
 }

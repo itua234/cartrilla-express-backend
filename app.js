@@ -46,7 +46,7 @@ if(process.env.NODE_ENV === "production"){
 function useRoutes() {
     app.get('/', function (req, res) {
         res.json({
-            'app': 'Peddle API',
+            'app': 'Cartrilla API',
             'version': '1.0.0'
         })
     });

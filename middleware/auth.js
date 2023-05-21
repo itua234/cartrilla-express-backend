@@ -4,9 +4,9 @@ module.exports = {
     isAuthenticated: (req, res, next) => {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
-        if(token == null) return res.sendStatus(401);
+        if(token == null) return res.status(422).json({});
         jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
-            if(err) return res.json({});
+            if(err) return res.status(422).json({});
             req.auth = user.user;
             next();
         }) 
