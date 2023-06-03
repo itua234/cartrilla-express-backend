@@ -9,5 +9,6 @@ router.get('/states', user.getStates);
 router.get('/address/shipping', isAuthenticated, user.getShippingAddress);
 router.get('/address/billing', isAuthenticated, user.getBillingAddress);
 router.post('/profile', [isAuthenticated, userProfileSchema], user.updateUserDetails);
+router.get('/cards', isAuthenticated, user.getUserCards);
 
 module.exports = router;

@@ -29,10 +29,9 @@ exports.intitializeTransaction = (details) => {
         })
         const params = JSON.stringify({
             "email": details["email"],
-            "channels": ["card", "bank", "ussd", "qr", "mobile_money" ],
+            "channels": ["card", "bank", "ussd"],
             "amount": details["amount"] * 100,
             "callback_url": "http://127.0.0.1:3000/order-complete/",
-            //"reference": details["reference"]
         })
         request.write(params);
         request.end();
@@ -144,4 +143,3 @@ exports.resolve = () => {
     //request.write(params);
     request.end();
 }
-

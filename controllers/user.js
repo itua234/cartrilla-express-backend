@@ -1,5 +1,8 @@
 const { auth } = require("../middleware/auth") ;
-const { sequelize, models: { User, ShippingAddress, BillingAddress, State } } = require('../models');
+const { 
+    sequelize,
+    models: { User, ShippingAddress, BillingAddress, State, UserCard } 
+} = require('../models');
 const http = require('https');
 require('dotenv').config();
 
@@ -66,6 +69,21 @@ exports.updateUserDetails = async(req, res) => {
     return res.status(200).json({
         message: "Account has been updated successfully",
         results: user,
+        error: false
+    });
+}
+
+exports.getUserCards = async(req, res) => {
+    const user = auth(req);
+    var cards = await UserCard.findAll({
+        where: {
+            user_id: user.id
+        }
+    });
+
+    res.status(200).json({
+        message: 'Card Details:',
+        results: cards,
         error: false
     });
 }

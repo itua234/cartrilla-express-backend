@@ -1,3 +1,15 @@
+const Sequelize = require('sequelize');
+const dbConfig = require('../config/db-config');
+const sequelize = new Sequelize(
+    dbConfig.DATABASE, 
+    dbConfig.USER, 
+    dbConfig.PASSWORD, 
+    {
+        dialect: dbConfig.DIALECT,
+        host: dbConfig.HOST
+    }
+);
+const Product  = require('./product')(sequelize, Sequelize.DataTypes);
 module.exports = (sequelize, DataTypes) => {
     const OrderContent = sequelize.define('OrderContent', {
         id: {
@@ -38,20 +50,16 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 'pending'
         },
     },{
+        timestamps: false,
         tableName: 'order_contents'
     })
 
-    OrderContent.associate = (models) => {
-        OrderContent.belongsTo(models.Product, {
-            onDelete: "CASCADE",
-            foreignKey: 'product_id',
-            targetKey: 'uuid'
-        });
-        OrderContent.belongsTo(models.Order, {
-            onDelete: "CASCADE",
-            foreignKey: 'order_id',
-            targetKey: 'id'
-        });
-    }
+    OrderContent.belongsTo(Product, {
+        onDelete: "CASCADE",
+        foreignKey: 'product_id',
+        targetKey: 'uuid',
+        as: "product"
+    });
+
     return OrderContent;
 }

@@ -51,35 +51,6 @@ module.exports = (sequelize, DataTypes) => {
         shipping_cost: {
             type: DataTypes.INTEGER,
         },
-    },{
-        // classMethods: {
-        //     associate: (models) => {
-        //         Product.belongsTo(models.User, {
-        //             onDelete: "CASCADE",
-        //             foreignKey: 'seller_id',
-        //             targetKey: 'id'
-        //         });
-        //         Product.belongsTo(models.Category, {
-        //             onDelete: "CASCADE",
-        //             foreignKey: 'category_id',
-        //             targetKey: 'id'
-        //         });
-        //         Product.belongsToMany(models.SubOrder, {
-        //             through: "order_contents",
-        //             onDelete: "CASCADE",
-        //         });
-        //         // Product.hasMany(models.ProductImage, {
-        //         //     onDelete: "CASCADE",
-        //         //     foreignKey: 'product_id',
-        //         //     targetKey: 'id'
-        //         // });
-        //         Product.hasMany(models.Review, {
-        //             onDelete: "CASCADE",
-        //             foreignKey: 'product_id',
-        //             targetKey: 'id'
-        //         });
-        //     }
-        // }
     })
 
     Product.hasMany(ProductImage, {

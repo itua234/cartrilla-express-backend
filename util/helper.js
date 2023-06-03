@@ -1,5 +1,5 @@
 module.exports = {
-    generateReference: () => 
+    generateReference: (id) => 
     {
         let token = "";
         let codeAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -9,6 +9,6 @@ module.exports = {
         for(var i = 0; i < 14; i++){
             token += codeAlphabet[Math.floor(Math.random() * (max - 0) + 0)]; 
         }; 
-        return token.toLowerCase();
+        return id+token.toLowerCase();
     }
 }

@@ -34,17 +34,5 @@ module.exports = (sequelize, DataTypes) => {
         },
     },{})
 
-    Review.associate = (models) => {
-        Review.belongsTo(models.User, {
-            onDelete: "CASCADE",
-            foreignKey: 'user_id',
-            targetKey: 'id'
-        });
-        Review.belongsTo(models.Product, {
-            onDelete: "CASCADE",
-            foreignKey: 'product_id',
-            targetKey: 'uuid'
-        });
-    }
     return Review;
 }

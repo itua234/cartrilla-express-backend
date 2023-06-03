@@ -1,22 +1,18 @@
-const bcrypt = require('bcrypt');
-const Sequelize = require('sequelize');
-const dbConfig = require('../config/db-config');
-const sequelize = new Sequelize(
-    dbConfig.DATABASE, 
-    dbConfig.USER, 
-    dbConfig.PASSWORD, 
-    {
-        dialect: dbConfig.DIALECT,
-        host: dbConfig.HOST
-    }
-);
-const Order = require('./order')(sequelize, Sequelize.DataTypes);
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('User', {
+    const OrderDetail = sequelize.define('OrderDetail', {
         id: {
             type: DataTypes.BIGINT(20).UNSIGNED,
             autoIncrement: true,
             primaryKey: true
+        },
+        order_id: {
+            type: DataTypes.BIGINT(20).UNSIGNED,
+            foreignKey: true,
+            references: {
+                model: {tableName: 'orders'},
+                key: 'id'
+            },
+            allowNull: false
         },
         firstname: {
             type: DataTypes.STRING,
@@ -44,7 +40,6 @@ module.exports = (sequelize, DataTypes) => {
         },
         email: {
             type: DataTypes.STRING,
-            unique: true,
             allowNull: false,
             get() {
                 const rawValue = this.getDataValue('email');
@@ -56,37 +51,24 @@ module.exports = (sequelize, DataTypes) => {
         },
         phone: {
             type: DataTypes.STRING,
-            unique: true,
             allowNull: false
         },
-        password: {
+        street: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: false
         },
-        email_verified_at: {
-            type: DataTypes.DATE,
+        city: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        state: {
+            type: DataTypes.STRING,
+            allowNull: false
         },
     },{
-        hooks: {
-            beforeCreate: async (user) => {
-                if(user.password){
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(user.password, salt);
-                };
-            },
-            beforeUpdate: async (user) => {
-                if(user.password){
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(user.password, salt);
-                };
-            }
-        }
+        timestamps: false,
+        tableName: 'order_details'
     })
 
-    User.hasMany(Order, {
-        onDelete: "CASCADE",
-        foreignKey: 'user_id',
-        targetKey: 'id'
-    });
-    return User;
+    return OrderDetail;
 }
