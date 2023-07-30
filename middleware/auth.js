@@ -30,5 +30,28 @@ module.exports = {
                 expiresIn: process.env.TOKEN_EXPIRE,
             }
         );
+    },
+    
+    isCartrilla: (req, res, next) => {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
+        //Check if the request contains authorization header
+        if (!authHeader) {
+            return res.status(400).json({
+                status: "fail",
+                message: "missing authorization header"
+            });
+        }
+        
+        //Check if the authorization token is equal to the app token
+        if (token != process.env.CARTRILLA_TOKEN) {
+            return res.status(400).json({
+                status: "fail",
+                message: "invalid bearer token"
+            });
+        }
+
+        next();
     }
 }

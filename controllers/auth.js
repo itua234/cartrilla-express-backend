@@ -1,49 +1,24 @@
 const nodemailer = require('nodemailer');
-const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
-const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const { createAccessToken } = require("../middleware/auth") ;
-const { sequelize, models: { User, PasswordReset, UserVerification } } = require('../models');
+const { sequelize, models: { User, Otp } } = require('../models');
+const { generateOtp } = require('../util/helper');
 require('dotenv').config();
 
 exports.register = async(req, res) => {
     const { firstname, lastname, email, phone, password } = req.body;
-    let error = {};
-    const oldUser = await User.findOne({
-        where: {
-            email: email
-        },
-        raw: true
-    })
-    if(oldUser){
-        error.email = ["user already exists"]
-    }
-    const checkPhone = await User.findOne({
-        where: {
-            phone: phone
-        },
-        raw: true
-    })
-    if(checkPhone){
-        error.phone = ["phone number already exists"]
-    }
-
-    if(Object.keys(error).length !== 0){
-        return res.status(409).json({
-            message: "registration failed",
-            error: error
-        });
-    }
-
+    
     try{
         await sequelize.transaction(async function(transaction) {
             const user = await User.create({
                 firstname, lastname, email, phone, password
             }, {transaction});
         
-            await UserVerification.create({
-                email, code: 2345, expiry_time: new Date()
+            await Otp.create({ 
+                token: generateOtp(),
+                email: user.email,
+                purpose: "email_verification"
             }, {transaction});
 
             //create token
@@ -116,11 +91,13 @@ exports.logout = (req, res) => {
 }
 
 exports.verifyEmail = async(req, res) => {
-    const { email, code } = req.params;
-    let check = await UserVerification.findOne({
+    const { email, token } = req.params;
+    let check = await Otp.findOne({
         where: {
+            token: token,
             email: email,
-            code: code
+            purpose: 'email_verification',
+            valid: true
         },
         raw: true
     });
@@ -130,7 +107,7 @@ exports.verifyEmail = async(req, res) => {
     }else{
         const user = await User.findOne({
             where: {
-                email: email,
+                email: email
             },
         });
         user.email_verified_at = new Date();
@@ -152,27 +129,13 @@ exports.forgotPassword = async(req, res) => {
         },
         raw:true
     });
-    let error = {};
-    if(!user){
-        error.email = ["email address not found"];
-    }
-    if(Object.keys(error).length !== 0){
-        return res.status(409).json({
-            message: "password reset failed",
-            error: error
-        });
-    }
     
-    let token = Math.floor(Math.random() * (9999 - 1000) + 1000);
-    let date = new Date();
-    date.setMinutes(date.getMinutes() + 6);
-    await PasswordReset.upsert(
-        {
-            email,
-            token: token,
-            expiry_time: date
-        }
-    )
+    await Otp.create({ 
+        token: generateOtp(),
+        email: user.email,
+        purpose: "password_reset"
+    }, {transaction});
+
     message = 'A password reset email has been sent! Please check your email.';  
     return res.status(200).json({
         message: message,
@@ -183,10 +146,12 @@ exports.forgotPassword = async(req, res) => {
 
 exports.verifyForgotPasswordToken = async(req, res) => {
     const { email, token } = req.params;
-    let check = await PasswordReset.findOne({
+    let check = await Otp.findOne({
         where: {
-            email,
-            token
+            token: token,
+            email: email,
+            purpose: 'password_reset',
+            valid: true
         },
         raw: true
     });
@@ -214,11 +179,14 @@ exports.resetPassword = async(req, res) => {
     user.password = password;
     await user.save();
 
-    await PasswordReset.destroy({
+    await Otp.destroy({
         where: {
-            email,
-            token
-        }
+            purpose: "password_reset",
+            token: token,
+            valid: true,
+            email: email
+        },
+        raw: true
     });
 
     return res.status(200).json({

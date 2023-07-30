@@ -1,18 +1,5 @@
-const bcrypt = require('bcrypt');
-const Sequelize = require('sequelize');
-const dbConfig = require('../config/db-config');
-const sequelize = new Sequelize(
-    dbConfig.DATABASE, 
-    dbConfig.USER, 
-    dbConfig.PASSWORD, 
-    {
-        dialect: dbConfig.DIALECT,
-        host: dbConfig.HOST
-    }
-);
-const Order = require('./order')(sequelize, Sequelize.DataTypes);
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('User', {
+    const Admin = sequelize.define('Admin', {
         id: {
             type: DataTypes.BIGINT(20).UNSIGNED,
             autoIncrement: true,
@@ -54,10 +41,6 @@ module.exports = (sequelize, DataTypes) => {
                 this.setDataValue('email', value.toLowerCase());
             }
         },
-        user_type: {
-            type: DataTypes.ENUM('user', 'admin'),
-            defaultValue: 'user'
-        },
         phone: {
             type: DataTypes.STRING,
             unique: true,
@@ -87,10 +70,5 @@ module.exports = (sequelize, DataTypes) => {
         }
     })
 
-    User.hasMany(Order, {
-        onDelete: "CASCADE",
-        foreignKey: 'user_id',
-        targetKey: 'id'
-    });
-    return User;
+    return Admin;
 }

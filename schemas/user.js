@@ -1,44 +1,95 @@
-const Joi = require('joi');
+const { sequelize, models: { Doctor } } = require('../models');
+const {Op} = require('sequelize');
+const {QueryTypes} = require('sequelize');
+const {returnValidationError} = require("../util/helper");
+
+const niv = require('node-input-validator');
+niv.extend('hasSpecialCharacter', ({value}) => {
+    if(!value.match(/[^a-zA-Z0-9]/)){
+        //Return an error if the value does not contain a special character
+        return false;
+    }
+    return true;
+})
+niv.extend('containsNumber', ({value}) => {
+    if(!value.match(/\d/)){
+        //Return an error if the value does not contain a special character
+        return false;
+    }
+    return true;
+})
+niv.extend('isSingleWord', ({value}) => {
+    if(value.includes(" ")){
+        //Return an error if the value does not contain a special character
+        return false;
+    }
+    return true;
+})
+niv.extend('unique', async ({value, args}) => {
+    const field = args[1] || attr;
+    let emailExist;
+    if(args[2]){
+        emailExist = await sequelize.query(`SELECT * FROM ${args[0]} WHERE ${field}=? AND id != ? LIMIT 1`,{
+            replacements: [value, args[2]],
+            type: QueryTypes.SELECT
+        })
+    }else{
+        emailExist = await sequelize.query(`SELECT * FROM ${args[0]} WHERE ${field}=? LIMIT 1`,{
+            replacements: [value],
+            type: QueryTypes.SELECT
+        })
+    }
+    
+    if(emailExist.length !== 0){
+        return false;
+    }
+    return true;
+})
+niv.extend('exists', async ({attr, value, args}) => {
+    const field = args[1] || attr;
+    let emailExist = await sequelize.query(`SELECT * FROM ${args[0]} WHERE ${field}=? LIMIT 1`,{
+        replacements: [value],
+        type: QueryTypes.SELECT
+    })
+    if(emailExist.length === 0){
+        return false;
+    }
+    return true;
+})
+niv.extend('confirmed', async ({attr, value}, validator) => {
+    const field = [attr]+'_confirmation';
+    let secondValue = validator.inputs[field]
+    if(value !== secondValue){
+        return false;
+    }
+    return true;
+})
+niv.extendMessages({
+    hasSpecialCharacter: 'The :attribute field must have a special character',
+    containsNumber: 'The :attribute field must contain a number',
+    isSingleWord: 'The :attribute field must be a single word',
+    exists: 'The selected :attribute is invalid.'
+})
+
 //export the schemas
 module.exports = {
-    userProfileSchema: (req, res, next) => {
-        const schema = Joi.object({
-            firstname: Joi.string().min(3).required(),
-            lastname: Joi.string().min(3).required(),
-            email: Joi.string().email({
-                minDomainSegments: 2,
-                tlds: {
-                    allow: ['com', 'net']
-                }
-            }).required()
-        }).options({abortEarly: false});
+    profileSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.body, {
+            firstname: 'required|string|minLength:3',
+            lastname: 'required|string|minLength:3',
+            email: 'required|string|email'
+            //email: 'required|email|unique:doctors,email'
+        });
 
-        const {error, value} = schema.validate(req.body);
-        if(error){
-            var check = {}
-            let details = error.details;
-            var obj;
-            var array = []; 
-            details.forEach((err) => {
-                var key = err.path[0];
-                var msg = err.message
-                var message = msg.replaceAll("\"", '');
-                if(array.includes(key)){
-                    obj[key].push(message);
-                }else{
-                    obj = Object.assign(check, {[key]: [message]});
-                }
-                array.push(key);
-            });
-            return res.status(422).json({
-                message: error.details[0].message,
-                error: obj,
-            });
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "failed to update profile");
         }else{
             if(!req.value){
                 req.value = {}
             }
-            req.body = value;
+            req.body = v.inputs;
             next();
         }
     }

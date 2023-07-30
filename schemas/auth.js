@@ -1,277 +1,192 @@
-const Joi = require('joi');
+const { sequelize, models: { Doctor } } = require('../models');
+const {Op} = require('sequelize');
+const {QueryTypes} = require('sequelize');
+const {returnValidationError} = require("../util/helper");
+
+const niv = require('node-input-validator');
+niv.extend('hasSpecialCharacter', ({value}) => {
+    if(!value.match(/[^a-zA-Z0-9]/)){
+        //Return an error if the value does not contain a special character
+        return false;
+    }
+    return true;
+})
+niv.extend('containsNumber', ({value}) => {
+    if(!value.match(/\d/)){
+        //Return an error if the value does not contain a special character
+        return false;
+    }
+    return true;
+})
+niv.extend('isSingleWord', ({value}) => {
+    if(value.includes(" ")){
+        //Return an error if the value does not contain a special character
+        return false;
+    }
+    return true;
+})
+niv.extend('unique', async ({value, args}) => {
+    const field = args[1] || attr;
+    let emailExist;
+    if(args[2]){
+        emailExist = await sequelize.query(`SELECT * FROM ${args[0]} WHERE ${field}=? AND id != ? LIMIT 1`,{
+            replacements: [value, args[2]],
+            type: QueryTypes.SELECT
+        })
+    }else{
+        emailExist = await sequelize.query(`SELECT * FROM ${args[0]} WHERE ${field}=? LIMIT 1`,{
+            replacements: [value],
+            type: QueryTypes.SELECT
+        })
+    }
+    
+    if(emailExist.length !== 0){
+        return false;
+    }
+    return true;
+})
+niv.extend('exists', async ({attr, value, args}) => {
+    const field = args[1] || attr;
+    let emailExist = await sequelize.query(`SELECT * FROM ${args[0]} WHERE ${field}=? LIMIT 1`,{
+        replacements: [value],
+        type: QueryTypes.SELECT
+    })
+    if(emailExist.length === 0){
+        return false;
+    }
+    return true;
+})
+niv.extend('confirmed', async ({attr, value}, validator) => {
+    const field = [attr]+'_confirmation';
+    let secondValue = validator.inputs[field]
+    if(value !== secondValue){
+        return false;
+    }
+    return true;
+})
+niv.extendMessages({
+    hasSpecialCharacter: 'The :attribute field must have a special character',
+    containsNumber: 'The :attribute field must contain a number',
+    isSingleWord: 'The :attribute field must be a single word',
+    exists: 'The selected :attribute is invalid.'
+})
 //export the schemas
 module.exports = {
-    registerSchema: (req, res, next) => {
-        const schema = Joi.object({
-            firstname: Joi.string().min(3).required(),
-            lastname: Joi.string().min(3).required(),
-            email: Joi.string().email({
-                minDomainSegments: 2,
-                tlds: {
-                    allow: ['com', 'net']
-                }
-            }).required(),
-            phone: Joi.number().required(),
-            password: Joi.string().min(8).required(),
-            password_confirmation: Joi.string().valid(Joi.ref('password')).required().error(errors => {
-                errors.forEach(err => {
-                    if(err.code === 'any.only'){
-                        err.message = 'Password and Confirm Password do not match'
-                    }
-                });
-                return errors;
-            })
-        }).options({abortEarly: false});
+    registerSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.body, {
+            firstname: 'required|string|minLength:3',
+            lastname: 'required|string|minLength:3',
+            phone: 'required|string|unique:users,phone',
+            email: 'required|string|email|unique:users,email',
+            password: 'required|string|minLength:8|hasSpecialCharacter|containsNumber|confirmed',
+            password_confirmation: 'required'
+        });
 
-        const {error, value} = schema.validate(req.body);
-        if(error){
-            var check = {}
-            let details = error.details;
-            var obj;
-            var array = []; 
-            details.forEach((err) => {
-                var key = err.path[0];
-                var msg = err.message
-                var message = msg.replaceAll("\"", '');
-                if(array.includes(key)){
-                    obj[key].push(message);
-                }else{
-                    obj = Object.assign(check, {[key]: [message]});
-                }
-                array.push(key);
-            });
-            return res.status(422).json({
-                message: error.details[0].message,
-                error: obj,
-            });
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "registration failed");
         }else{
             if(!req.value){
                 req.value = {}
             }
-            req.body = value;
+            req.body = v.inputs;
             next();
         }
     },
 
-    loginSchema: (req, res, next) => {
-        const schema = Joi.object({
-            email: Joi.string().email({
-                minDomainSegments: 2,
-                tlds: {
-                    allow: ['com', 'net']
-                }
-            }).required(),
-            password: Joi.string().min(8).required()
-        }).options({abortEarly: false});
+    loginSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.body, {
+            email: 'required|email',
+            password: 'required|string',
+        });
 
-        const {error, value} = schema.validate(req.body);
-        if(error){
-            var check = {}
-            let details = error.details;
-            var obj;
-            var array = []; 
-            details.forEach((err) => {
-                var key = err.path[0];
-                var msg = err.message
-                var message = msg.replaceAll("\"", '');
-                if(array.includes(key)){
-                    obj[key].push(message);
-                }else{
-                    obj = Object.assign(check, {[key]: [message]});
-                }
-                array.push(key);
-            });
-            return res.status(422).json({
-                message: error.details[0].message,
-                error: obj,
-            });
-            // return res.status(422).json({
-            //     message: error.details[0].message,
-            //     error: error.details
-            // });
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "Login failed");
         }else{
             if(!req.value){
                 req.value = {}
             }
-            req.body = value;
+            req.body = v.inputs;
             next();
         }
     },
 
-    verifyEmailSchema: (req, res, next) => {
-        const schema = Joi.object({
-            email: Joi.required(),
-            code: Joi.required()
-        }).options({abortEarly: false});
-        const options = {
-            abortEarly: false,
-            allowUnknown: false,
-            stripUnknown: true
-        };
-        const {error, value} = schema.validate(req.params);
-        if(error){
-            var check = {}
-            let details = error.details;
-            var obj;
-            var array = []; 
-            details.forEach((err) => {
-                var key = err.path[0];
-                var msg = err.message
-                var message = msg.replaceAll("\"", '');
-                if(array.includes(key)){
-                    obj[key].push(message);
-                }else{
-                    obj = Object.assign(check, {[key]: [message]});
-                }
-                array.push(key);
-            });
-            return res.status(422).json({
-                message: error.details[0].message,
-                error: obj,
-            });
+    verifyEmailSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.params, {
+            email: 'required|exists:users,email',
+            token: 'required',
+        });
+
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "email verification failed");
         }else{
             if(!req.value){
                 req.value = {}
             }
-            req.body = value;
+            req.body = v.inputs;
             next();
         }
     },
 
-    forgotPasswordSchema: (req, res, next) => {
-        const schema = Joi.object({
-            email: Joi.string().email({
-                minDomainSegments: 2,
-                tlds: {
-                    allow: ['com', 'net']
-                }
-            }).required(),
-        }).options({abortEarly: false});
-        const options = {
-            abortEarly: false,
-            allowUnknown: false,
-            stripUnknown: true
-        };
-        const {error, value} = schema.validate(req.body);
-        if(error){
-            var check = {}
-            let details = error.details;
-            var obj;
-            var array = []; 
-            details.forEach((err) => {
-                var key = err.path[0];
-                var msg = err.message
-                var message = msg.replaceAll("\"", '');
-                if(array.includes(key)){
-                    obj[key].push(message);
-                }else{
-                    obj = Object.assign(check, {[key]: [message]});
-                }
-                array.push(key);
-            });
-            return res.status(422).json({
-                message: error.details[0].message,
-                error: obj,
-            });
+    forgotPasswordSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.body, {
+            email: 'required|string|email|exists:users,email',
+        });
+
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "reset password failed");
         }else{
             if(!req.value){
                 req.value = {}
             }
-            req.body = value;
+            req.body = v.inputs;
             next();
         }
     },
 
-    verifyForgotPasswordTokenSchema: (req, res, next) => {
-        const schema = Joi.object({
-            email: Joi.required(),
-            token: Joi.required()
-        }).options({abortEarly: false});
-        const options = {
-            abortEarly: false,
-            allowUnknown: false,
-            stripUnknown: true
-        };
-        const {error, value} = schema.validate(req.params);
-        if(error){
-            var check = {}
-            let details = error.details;
-            var obj;
-            var array = []; 
-            details.forEach((err) => {
-                var key = err.path[0];
-                var msg = err.message
-                var message = msg.replaceAll("\"", '');
-                if(array.includes(key)){
-                    obj[key].push(message);
-                }else{
-                    obj = Object.assign(check, {[key]: [message]});
-                }
-                array.push(key);
-            });
-            return res.status(422).json({
-                message: error.details[0].message,
-                error: obj,
-            });
+    verifyForgotPasswordTokenSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.params, {
+            email: 'required|exists:users,email',
+            token: 'required',
+        });
+
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "password reset token verification failed");
         }else{
             if(!req.value){
                 req.value = {}
             }
-            req.body = value;
+            req.body = v.inputs;
             next();
         }
     },
  
-    resetPasswordSchema: (req, res, next) => {
-        const schema = Joi.object({
-            email: Joi.string().email({
-                minDomainSegments: 2,
-                tlds: {
-                    allow: ['com', 'net']
-                }
-            }).required(),
-            token: Joi.required(),
-            password: Joi.string().min(8).required(),
-            password_confirmation: Joi.string().valid(Joi.ref('password')).required().error(errors => {
-                errors.forEach(err => {
-                    if(err.code === 'any.only'){
-                        err.message = 'Password and Confirm Password do not match'
-                    }
-                });
-                return errors;
-            })
-        }).options({abortEarly: false});
-        const options = {
-            abortEarly: false,
-            allowUnknown: false,
-            stripUnknown: true
-        };
-        const {error, value} = schema.validate(req.body);
-        if(error){
-            var check = {}
-            let details = error.details;
-            var obj;
-            var array = []; 
-            details.forEach((err) => {
-                var key = err.path[0];
-                var msg = err.message
-                var message = msg.replaceAll("\"", '');
-                if(array.includes(key)){
-                    obj[key].push(message);
-                }else{
-                    obj = Object.assign(check, {[key]: [message]});
-                }
-                array.push(key);
-            });
-            return res.status(422).json({
-                message: error.details[0].message,
-                error: obj,
-            });
+    resetPasswordSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.body, {
+            email: 'required|string|email|exists:users,email',
+            token: 'required',
+            password: 'required|string|minLength:8|hasSpecialCharacter|containsNumber|confirmed',
+            password_confirmation: 'required'
+        });
+
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "password reset failed");
         }else{
             if(!req.value){
                 req.value = {}
             }
-            req.body = value;
+            req.body = v.inputs;
             next();
         }
     },

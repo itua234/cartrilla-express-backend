@@ -1,11 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const auth = require('./routes/auth');
-const product = require('./routes/product');
-const order = require('./routes/order');
-const category = require('./routes/category');
-const user = require('./routes/user');
+const routes = require('./routes/index');
 const db = require('./models');
 const cors = require('cors');
 
@@ -50,10 +46,6 @@ function useRoutes() {
             'version': '1.0.0'
         })
     });
-    app.use('/api/v1/auth/', auth);
-    app.use('/api/v1/user', user);
-    app.use('/api/v1/product', product);
-    app.use('/api/v1/order', order);
-    app.use('/api/v1/category', category);
+    app.use('/api/v1/', routes);
 }
 
