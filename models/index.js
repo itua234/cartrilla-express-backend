@@ -14,6 +14,7 @@ const db = {};
 db.sequelize = sequelize;
 db.models = {};
 db.models.User = require('./user')(sequelize, Sequelize.DataTypes);
+db.models.Admin = require('./admin')(sequelize, Sequelize.DataTypes);
 db.models.State = require('./state')(sequelize, Sequelize.DataTypes);
 db.models.Otp = require('./otp')(sequelize, Sequelize.DataTypes);
 db.models.UserCard = require('./user_card')(sequelize, Sequelize.DataTypes);

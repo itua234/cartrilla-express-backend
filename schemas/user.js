@@ -1,7 +1,8 @@
-const { sequelize, models: { Doctor } } = require('../models');
+const { sequelize, models: { User } } = require('../models');
 const {Op} = require('sequelize');
 const {QueryTypes} = require('sequelize');
 const {returnValidationError} = require("../util/helper");
+const { auth } = require("../middleware/auth") ;
 
 const niv = require('node-input-validator');
 niv.extend('hasSpecialCharacter', ({value}) => {
@@ -25,7 +26,7 @@ niv.extend('isSingleWord', ({value}) => {
     }
     return true;
 })
-niv.extend('unique', async ({value, args}) => {
+niv.extend('unique', async ({attr, value, args}) => {
     const field = args[1] || attr;
     let emailExist;
     if(args[2]){
@@ -74,17 +75,65 @@ niv.extendMessages({
 //export the schemas
 module.exports = {
     profileSchema: async(req, res, next) => {
+        const user = auth(req);
         const v = new niv.Validator(req.body, {
             firstname: 'required|string|minLength:3',
             lastname: 'required|string|minLength:3',
-            email: 'required|string|email'
-            //email: 'required|email|unique:doctors,email'
+            phone: `required|string|unique:users,phone,${user.id}`
         });
 
         let matched = await v.check();
         if(!matched){
             let errors = v.errors;
-            returnValidationError(errors, res, "failed to update profile");
+            returnValidationError(errors, res, "registration failed");
+        }else{
+            if(!req.value){
+                req.value = {}
+            }
+            req.body = v.inputs;
+            next();
+        }
+    },
+
+    updateShippingSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.body, {
+            firstname: 'required|string',
+            lastname: 'required|string',
+            phone: `required|string`,
+            email: 'required|string|email',
+            street: 'required|string',
+            city: 'required|string',
+            state: 'required|string',
+        });
+
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "failed to update shipping details");
+        }else{
+            if(!req.value){
+                req.value = {}
+            }
+            req.body = v.inputs;
+            next();
+        }
+    },
+
+    updateBillingSchema: async(req, res, next) => {
+        const v = new niv.Validator(req.body, {
+            firstname: 'required|string',
+            lastname: 'required|string',
+            phone: `required|string`,
+            email: 'required|string|email',
+            street: 'required|string',
+            city: 'required|string',
+            state: 'required|string',
+        });
+
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "failed to update billing details");
         }else{
             if(!req.value){
                 req.value = {}

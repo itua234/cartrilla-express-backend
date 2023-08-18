@@ -9,6 +9,7 @@ const sequelize = new Sequelize(
         host: dbConfig.HOST
     }
 );
+const User = require('./user')(sequelize, Sequelize.DataTypes);
 const OrderDetail = require('./order_detail')(sequelize, Sequelize.DataTypes);
 const OrderContent = require('./order_content')(sequelize, Sequelize.DataTypes);
 module.exports = (sequelize, DataTypes) => {
@@ -36,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         amount_paid: {
             type: DataTypes.INTEGER,
+            defaultValue: 0
         },
         shipping_cost: {
             type: DataTypes.INTEGER,
@@ -55,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         status: {
-            type: DataTypes.ENUM('pending', 'delivered', 'cancelled'),
+            type: DataTypes.ENUM('pending', 'completed', 'cancelled'),
             defaultValue: 'pending'
         },
         verified: {
@@ -68,16 +70,19 @@ module.exports = (sequelize, DataTypes) => {
     },{})
 
     Order.hasOne(OrderDetail, {
-        onDelete: "CASCADE",
         foreignKey: 'order_id',
         targetKey: 'id',
         as: "detail"
     });
     Order.hasMany(OrderContent, {
-        onDelete: "CASCADE",
         foreignKey: 'order_id',
         targetKey: 'id',
         as: "contents"
+    });
+    Order.belongsTo(User, {
+        foreignKey: 'user_id',
+        targetKey: 'id',
+        as: "user"
     });
 
     return Order;

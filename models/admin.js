@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
                 return rawValue ? rawValue : null;
             },
             set(value) {
+                value = value.toLowerCase();
                 const val = value.charAt(0).toUpperCase() + value.slice(1);
                 this.setDataValue('firstname', val);
             }
@@ -25,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
                 return rawValue ? rawValue : null;
             },
             set(value) {
+                value = value.toLowerCase();
                 const val = value.charAt(0).toUpperCase() + value.slice(1);
                 this.setDataValue('lastname', val);
             }
@@ -53,6 +55,17 @@ module.exports = (sequelize, DataTypes) => {
         email_verified_at: {
             type: DataTypes.DATE,
         },
+        login: {
+            type: DataTypes.JSON,
+            allowNull: false,
+            get() {
+                const rawValue = this.getDataValue('login');
+                return rawValue ? rawValue : null;
+            },
+            set(value) {
+                this.setDataValue('login', JSON.stringify(value));
+            }
+        }
     },{
         hooks: {
             beforeCreate: async (user) => {
@@ -63,10 +76,15 @@ module.exports = (sequelize, DataTypes) => {
             },
             beforeUpdate: async (user) => {
                 if(user.password){
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(user.password, salt);
+                    //const salt = await bcrypt.genSalt(10);
+                    //user.password = await bcrypt.hash(user.password, salt);
                 };
-            }
+            },
+            afterFind: async (user) => {
+                if(user.login){
+                    user.login = JSON.parse(user.login);
+                };
+            },
         }
     })
 

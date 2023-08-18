@@ -12,6 +12,8 @@ const sequelize = new Sequelize(
 const ProductImage  = require('./product_image')(sequelize, Sequelize.DataTypes);
 const Category = require('./category')(sequelize, Sequelize.DataTypes);
 const Review = require('./review')(sequelize, Sequelize.DataTypes);
+//const OrderContent = require('./order_content')(sequelize, Sequelize.DataTypes);
+
 module.exports = (sequelize, DataTypes) => {
     const Product = sequelize.define('Product', {
         uuid: {
@@ -62,12 +64,19 @@ module.exports = (sequelize, DataTypes) => {
     Product.belongsTo(Category, {
         onDelete: "CASCADE",
         foreignKey: 'category_id',
-        targetKey: 'id'
+        targetKey: 'id',
+        as: "category"
     });
     Product.hasMany(Review, {
         onDelete: "CASCADE",
         foreignKey: 'product_id',
         targetKey: 'uuid'
     });
+    /*Product.hasMany(OrderContent, {
+        onDelete: "CASCADE",
+        foreignKey: 'product_id',
+        targetKey: 'uuid',
+        as: "orders"
+    });*/
     return Product;
 }

@@ -53,5 +53,23 @@ module.exports = {
         }
 
         next();
+    },
+
+    isAdminAuth: (req, res, next) => {
+        //If session exists proceed to the next middleware
+        if (req.session && req.session.user) {
+            /*const accessedUrl = req.originalUrl;
+            if(accessedUrl == "/login"){
+                return res.redirect("/dashboard");
+            }else if(accessedUrl == "/register"){
+                res.redirect("/dashboard");
+            }else{
+                next();
+            }*/
+            next();
+        }else{
+            //If session does not exist, redirect to login page or another route
+            res.redirect("/login");
+        }
     }
 }

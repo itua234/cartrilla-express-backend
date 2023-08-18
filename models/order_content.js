@@ -55,7 +55,6 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     OrderContent.belongsTo(Product, {
-        onDelete: "CASCADE",
         foreignKey: 'product_id',
         targetKey: 'uuid',
         as: "product"

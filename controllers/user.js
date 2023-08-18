@@ -43,6 +43,33 @@ exports.getShippingAddress = async(req, res) => {
     });
 }
 
+exports.updateShippingAddress = async(req, res) => {
+    const {firstname, lastname, email, phone, street, city, state} = req.body;
+    const user = auth(req);
+    let address = await ShippingAddress.findOne({
+        where: {
+            user_id: user.id,
+        }
+    });
+
+    address.set({
+        firstname,
+        lastname,
+        email,
+        phone,
+        street,
+        city,
+        state
+    });
+    await address.save();
+
+    return res.status(200).json({
+        message: "Address:",
+        results: address,
+        error: false
+    });
+}
+
 exports.getBillingAddress = async(req, res) => {
     const user = auth(req);
     let address = await BillingAddress.findOne({
@@ -57,10 +84,37 @@ exports.getBillingAddress = async(req, res) => {
     });
 }
 
-exports.updateUserDetails = async(req, res) => {
-    const { firstname, lastname, email} = req.body;
+exports.updateBillingAddress = async(req, res) => {
+    const {firstname, lastname, email, phone, street, city, state} = req.body;
     const user = auth(req);
-    await User.update({firstname, lastname, email},
+    let address = await BillingAddress.findOne({
+        where: {
+            user_id: user.id,
+        }
+    });
+
+    address.set({
+        firstname,
+        lastname,
+        email,
+        phone,
+        street,
+        city,
+        state
+    });
+    await address.save();
+
+    return res.status(200).json({
+        message: "Address:",
+        results: address,
+        error: false
+    });
+}
+
+exports.updateUserDetails = async(req, res) => {
+    const { firstname, lastname, phone} = req.body;
+    const user = auth(req);
+    await User.update({firstname, lastname, phone},
     {
         where: {
             id: user.id

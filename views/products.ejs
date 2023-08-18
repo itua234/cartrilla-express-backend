@@ -1,0 +1,215 @@
+<%- include("layout/header.ejs") %>
+      <div class="container-fluid" style="background-color:#F5F6FA">
+         <!--  Row 1 -->
+          <div class="">
+            <div class="cr-sidebar scroll-sidebar" data-simplebar="">
+              <div class="container">
+                <div class="">
+                  <h5 class="card-title mb-9 fw-semibold">New Product</h5>
+                  <p>Add information and add new product</p>
+                  <div>
+                    <form enctype="multipart/form-data" action="" method="POST">
+                      <div class="mb-3">
+                        <label class="form-label">
+                        Product Name</label>
+                        <input type="text" class="form-control" name="name">
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <div class="mb-3">
+                            <label class="form-label">
+                            Regular Price</label>
+                            <input type="text" class="form-control" name="price">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                            Stock</label>
+                            <input type="text" class="form-control" name="stock">
+                        </div>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label class="form-label">
+                        Brand</label>
+                        <input type="text" class="form-control" name="brand">
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label class="form-label">
+                        Category</label>
+                        <select name="category" class="form-control">
+                            
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">
+                        Description</label>
+                        <textarea class="form-control" name="description"></textarea>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">
+                        Image</label>
+                        <input type="file" class="form-control" name="images" multiple>
+                      </div>
+                      
+                      <button type="submit" class="btn btn-primary">
+                        <img src="/assets/images/icons/plus.svg" />
+                      Add New
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="">
+                <h5 class="card-title mb-9 fw-semibold">Products</h5>
+                <a href="" target="_blank" class="btn btn-primary cr-add-product-toggle">
+                  <img src="/assets/images/icons/plus.svg" />
+                  Add Product
+                </a>
+              </div>
+              <div class="">
+                <form action="" method="" class="d-flex">
+                    <div class="d-flex search-input-box">
+                      <input type="text" class="search-input" placeholder="Quick search by date">
+                      <div class="d-flex align-items-center justify-content-center" style="padding:10px;">
+                         <img src="/assets/images/icons/search.svg" />
+                      </div>
+                    </div>
+                   <div class="">
+                      <select class="search-select" name="">
+                         
+                      </select>
+                   </div>
+                </form>
+              </div>
+            
+               <div class="table-responsive">
+                 <table class="table text-nowrap align-middle" style="border-collapse:separate;border-spacing:0 15px;">
+                   <thead class="text-dark fs-4" style="background-color:white">
+                      <tr>
+                       <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">Sn.</h6>
+                       </th>
+                        <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">Name</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">Price</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">Stock</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">Category</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">Orders</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">View</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                         <h6 class="fw-semibold mb-0">Edit</h6>
+                        </th>
+                        <th class="border-bottom-0">
+                           <h6 class="fw-semibold mb-0">Delete</h6>
+                        </th>
+                      </tr>
+                    </thead>
+                   <tbody class="cr-all-products" style="background-color:white">
+                         
+                   </tbody>
+                 </table>
+               </div>
+
+               <div class="card">
+                 <div class="card-body">
+                   <div class="row">
+                     <div class="col-sm-12 col-md-6 d-flex justify-content-md-start justify-content-center mb-md-0 mb-3">
+                       <div class="d-flex align-items-center">
+                         <div class="pagination">
+                           <li class="page-item"><button class="page-link-item">1</button></li>
+                           <li class="page-item"><button class="page-link-item">2</button></li>
+                           <li class="page-item"><button class="page-link-item">3</button></li>
+                           <li class="page-item"><button class="page-link-item">4</button></li>
+                           <li class="page-item"><button class="page-link-item">5</button></li>
+                         </div>
+                       </div>
+                     </div>
+                     
+                     <div class="col-sm-12 col-md-6 d-flex justify-content-md-end justify-content-center">
+                       <div class="d-flex align-items-center">
+                         <div>PAGE</div>
+                         <form class="pagination-form" action="">
+                          <select class="pagination-form-select">
+
+                          </select>
+                         </form>
+                         <div>OF <span class="pagination-pages-count"></span></div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+
+
+            </div>
+         </div>
+
+         <!-- Start Of Modal -->
+         <div class="cr-modal">
+            <div class="cr-modal-content">
+               <div class="modal-header">
+                 <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                   <span aria-hidden="true">&times;</span>
+                 </button>
+               </div>
+               <div class="modal-body">
+                  <h5 class="card-title mb-9 fw-semibold">New Product</h5>
+                  <p>Add information and add new product</p>
+               </div>
+               <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                 <button type="button" class="btn btn-primary">Save changes</button>
+               </div>
+            </div>
+         </div>
+         <!-- End Of Modal -->
+
+         <!--<div class="py-6 px-6 text-center">
+               <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank" class="pe-1 text-primary text-decoration-underline">AdminMart.com</a> Distributed by <a href="https://themewagon.com">ThemeWagon</a></p>
+         </div>-->
+      </div>
+   </div>
+</div>
+<script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+<script src="/assets/libs/axios/axios.js"></script>
+<script src="/assets/js/products.js"></script>
+<script src="/assets/js/socket.js"></script>
+<script>
+    var socket = io();
+    //const socket = io("https://server-domain.com");
+
+    $(function () {
+      //alert("softeh");
+      //socket.emit("ping", {"name": "softech"});
+    });
+
+    socket.on("connect", function () {
+      console.log("connected to server"); // true
+      socket.on("ping", (data) => {
+        alert(JSON.stringify(data));
+      });
+    });
+
+    socket.on("disconnect", function () {
+      console.log("disconnected from server"); // true
+    });
+  </script>
+<%- include("layout/footer.ejs") %>
+
+    

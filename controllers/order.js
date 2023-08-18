@@ -80,29 +80,69 @@ exports.verifyOrder = async(req, res) => {
         getPaymentData(reference)
         .then(data => {
             let result = JSON.parse(data);
-            let channel = result.data.channel;
-            let authorization = result.data.authorization;
-            authorization.user_id = user.id;
+            let channel = result["data"]["channel"];
+            let authorization = result["data"]["authorization"];
+
             async function updateOrder(){
                 order.payment_status = result.data.status;
                 order.payment_channel = channel;
                 order.verified = true;
-                order.amount_paid = result.data.amount / 100;
+                order.amount_paid = result["data"]["amount"] / 100;
                 await order.save();
 
-                // if(channel == "card"){
-                //     await UserCard.create(
-                //         authorization
-                //     );
-                // }
+                if(channel == "card"){
+                    var card = await UserCard.findOne({
+                        where: {
+                            user_id: user.id,
+                            last4: authorization["last4"],
+                            bin: authorization["bin"]
+                        }
+                    });
+                    
+                    switch(card){
+                        case null:
+                            card = await UserCard.create({
+                                user_id: user.id,
+                                authorization_code: authorization.authorization_code,
+                                exp_month: authorization.exp_month,
+                                exp_year: authorization.exp_year,
+                                channel: authorization.channel,
+                                card_type: authorization.card_type,
+                                bank: authorization.bank,
+                                country_code: authorization.country_code,
+                                brand: authorization.brand,
+                                signature: authorization.signature,
+                                account_name: authorization.account_name,
+                                last4: authorization.last4,
+                                bin: authorization.bin,
+                                reusable: authorization.reusable ? 1 : 0 
+                            });
+                        break;
+                        default:
+                            card.set({
+                                authorization_code: authorization.authorization_code,
+                                exp_month: authorization.exp_month,
+                                exp_year: authorization.exp_year,
+                                channel: authorization.channel,
+                                card_type: authorization.card_type,
+                                bank: authorization.bank,
+                                country_code: authorization.country_code,
+                                brand: authorization.brand,
+                                signature: authorization.signature,
+                                account_name: authorization.account_name,
+                                reusable: authorization.reusable ? 1 : 0 
+                            });
+                            await card.save();
+                    }
+                }
+
+                return res.status(200).json({
+                    message: 'Order reference verification successful',
+                    results: order,
+                    error: false
+                });
             };
             updateOrder();
-            
-            return res.status(200).json({
-                message: 'Order reference verification successful',
-                results: order,
-                error: false
-            });
         }).catch(err => {
             return res.status(500).json({
                 message: 'Order verification failed',

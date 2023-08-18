@@ -11,11 +11,6 @@ module.exports = (sequelize, DataTypes) => {
         // },
         user_id: {
             type: DataTypes.BIGINT(20).UNSIGNED,
-            foreignKey: true,
-            references: {
-                model: {tableName: 'users'},
-                key: 'id'
-            },
             allowNull: false
         },
         authorization_code: {
@@ -26,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         last4: {
             type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
+            unique: true,
+            allowNull: false
         },
         exp_month: {
             type: DataTypes.STRING,
@@ -37,8 +32,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         bin: {
             type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
+            unique: true,
+            allowNull: false
         },
         bank: {
             type: DataTypes.STRING,
@@ -54,8 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         reusable: {
             type: DataTypes.BOOLEAN,
-            defaultValue: 1,
-            allowNull: false,
+            defaultValue: 1
         },
         country_code: {
             type: DataTypes.STRING,

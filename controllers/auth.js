@@ -16,8 +16,9 @@ exports.register = async(req, res) => {
             }, {transaction});
         
             await Otp.create({ 
+                otpable_id: user.id,
+                otpable_type: "user",
                 token: generateOtp(),
-                email: user.email,
                 purpose: "email_verification"
             }, {transaction});
 
@@ -92,10 +93,17 @@ exports.logout = (req, res) => {
 
 exports.verifyEmail = async(req, res) => {
     const { email, token } = req.params;
+    const user = await User.findOne({
+        where: {
+            email: email
+        },
+        raw:true
+    });
     let check = await Otp.findOne({
         where: {
+            otpable_id: user.id,
+            otpable_type: "user",
             token: token,
-            email: email,
             purpose: 'email_verification',
             valid: true
         },
@@ -105,11 +113,6 @@ exports.verifyEmail = async(req, res) => {
     if(Object.is(check, null)){
         res.send({msg: 'null'});
     }else{
-        const user = await User.findOne({
-            where: {
-                email: email
-            },
-        });
         user.email_verified_at = new Date();
         await user.save();
 
@@ -131,8 +134,9 @@ exports.forgotPassword = async(req, res) => {
     });
     
     await Otp.create({ 
+        otpable_id: user.id,
+        otpable_type: "user",
         token: generateOtp(),
-        email: user.email,
         purpose: "password_reset"
     }, {transaction});
 
@@ -146,10 +150,18 @@ exports.forgotPassword = async(req, res) => {
 
 exports.verifyForgotPasswordToken = async(req, res) => {
     const { email, token } = req.params;
+    let user = await User.findOne({
+        where: {
+            email: email,
+        },
+        raw:true
+    });
+
     let check = await Otp.findOne({
         where: {
+            otpable_id: user.id,
+            otpable_type: "user",
             token: token,
-            email: email,
             purpose: 'password_reset',
             valid: true
         },
@@ -181,10 +193,11 @@ exports.resetPassword = async(req, res) => {
 
     await Otp.destroy({
         where: {
+            otpable_id: user.id,
+            otpable_type: "user",
             purpose: "password_reset",
             token: token,
-            valid: true,
-            email: email
+            valid: true
         },
         raw: true
     });

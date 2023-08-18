@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
                 return rawValue ? rawValue : null;
             },
             set(value) {
+                value = value.toLowerCase();
                 const val = value.charAt(0).toUpperCase() + value.slice(1);
                 this.setDataValue('firstname', val);
             }
@@ -34,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
                 return rawValue ? rawValue : null;
             },
             set(value) {
+                value = value.toLowerCase();
                 const val = value.charAt(0).toUpperCase() + value.slice(1);
                 this.setDataValue('lastname', val);
             }
@@ -66,12 +68,5 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'shipping_address'
     })
     
-    ShippingAddress.associate = (models) => {
-        ShippingAddress.belongsTo(models.User, {
-            onDelete: "CASCADE",
-            foreignKey: 'user_id',
-            targetKey: 'id'
-        });
-    }
     return ShippingAddress;
 }

@@ -5,11 +5,15 @@ module.exports = (sequelize, DataTypes) => {
             autoIncrement: true,
             primaryKey: true
         },
-        token: {
+        otpable_id: {
+            type: DataTypes.BIGINT(20).UNSIGNED,
+            allowNull: false
+        },
+        otpable_type: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        email: {
+        token: {
             type: DataTypes.STRING,
             allowNull: false
         },

@@ -21,12 +21,5 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'product_images'
     })
 
-    ProductImage.associate = (models) => {
-        ProductImage.belongsTo(models.Product, {
-            onDelete: "CASCADE",
-            foreignKey: 'product_id',
-            targetKey: 'uuid'
-        });
-    }
     return ProductImage;
 }

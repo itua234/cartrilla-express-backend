@@ -10,7 +10,7 @@ const sequelize = new Sequelize(
         host: dbConfig.HOST
     }
 );
-const Order = require('./order')(sequelize, Sequelize.DataTypes);
+
 module.exports = (sequelize, DataTypes) => {
     const User = sequelize.define('User', {
         id: {
@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
                 return rawValue ? rawValue : null;
             },
             set(value) {
+                value = value.toLowerCase();
                 const val = value.charAt(0).toUpperCase() + value.slice(1);
                 this.setDataValue('firstname', val);
             }
@@ -38,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
                 return rawValue ? rawValue : null;
             },
             set(value) {
+                value = value.toLowerCase();
                 const val = value.charAt(0).toUpperCase() + value.slice(1);
                 this.setDataValue('lastname', val);
             }
@@ -53,10 +55,6 @@ module.exports = (sequelize, DataTypes) => {
             set(value) {
                 this.setDataValue('email', value.toLowerCase());
             }
-        },
-        user_type: {
-            type: DataTypes.ENUM('user', 'admin'),
-            defaultValue: 'user'
         },
         phone: {
             type: DataTypes.STRING,
@@ -87,10 +85,5 @@ module.exports = (sequelize, DataTypes) => {
         }
     })
 
-    User.hasMany(Order, {
-        onDelete: "CASCADE",
-        foreignKey: 'user_id',
-        targetKey: 'id'
-    });
     return User;
 }

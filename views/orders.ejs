@@ -1,0 +1,248 @@
+<%- include("layout/header.ejs") %>
+      <div class="container-fluid" style="background-color:#F5F6FA">
+         <!--  Row 1 -->
+         
+         <div class="row">
+            <div class="col">
+               <div class="d-flex justify-content-between">
+                  <h5 class="card-title mb-9 fw-semibold">Orders</h5>
+                  <form class="" action="" method="">
+                     <div class="d-flex search-input-box">
+                        <input type="text" class="search-input" placeholder="Quick search by date">
+                        <div class="d-flex align-items-center justify-content-center" style="padding:10px;">
+                           <img src="/assets/images/icons/search.svg" />
+                        </div>
+                     </div>
+                     <div class="">
+                        <select class="search-select" name="">
+                           <option value="pending">On  Hold</option>
+                           <option value="delivered">Delivered</option>
+                           <option value="cancelled">Cancelled</option>
+                        </select>
+                     </div>
+                  </form>
+               </div>
+               <!-- Start Of Data Table -->
+               <div class="table-responsive">
+                  <table class="table text-nowrap align-middle cr-all-orders" style="border-collapse:separate;border-spacing:0 15px;">
+                     <thead class="text-dark fs-4" style="background-color:white">
+                        <tr>
+                           <th class="border-bottom-0">
+                              <h6 class="fw-semibold mb-0">Order No.</h6>
+                           </th>
+                           <th class="border-bottom-0">
+                              <h6 class="fw-semibold mb-0">Customer</h6>
+                           </th>
+                           <th class="border-bottom-0">
+                              <h6 class="fw-semibold mb-0">Date</h6>
+                           </th>
+                           <th class="border-bottom-0">
+                              <h6 class="fw-semibold mb-0">Amount</h6>
+                           </th>
+                           <th class="border-bottom-0">
+                              <h6 class="fw-semibold mb-0">Status</h6>
+                           </th>
+                           <th class="border-bottom-0">
+                              <img src="/assets/images/icons/dots.svg" />
+                           </th>
+                        </tr>
+                     </thead>
+                     <tbody class="" style="background-color:white">
+                        
+                     </tbody>
+                  </table>
+               </div>
+               <!-- End Of Data Table -->
+               <!-- Start Of Pagination -->
+               <div class="card">
+                  <div class="card-body">
+                     <div class="row">
+                        <div class="col-sm-12 col-md-6 d-flex justify-content-md-start justify-content-center mb-md-0 mb-3">
+                        <div class="d-flex align-items-center">
+                           <div class="pagination">
+                              <li class="page-item"><button class="page-link-item">1</button></li>
+                              <li class="page-item"><button class="page-link-item">2</button></li>
+                              <li class="page-item"><button class="page-link-item">3</button></li>
+                              <li class="page-item"><button class="page-link-item">4</button></li>
+                              <li class="page-item"><button class="page-link-item">5</button></li>
+                           </div>
+                        </div>
+                        </div>
+                        
+                        <div class="col-sm-12 col-md-6 d-flex justify-content-md-end justify-content-center">
+                        <div class="d-flex align-items-center">
+                           <div>PAGE</div>
+                           <form class="pagination-form" action="">
+                              <select class="pagination-form-select">
+                                 
+                              </select>
+                           </form>
+                           <div>OF <span class="pagination-pages-count"></span></div>
+                        </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- End Of Pagination -->
+            </div>
+         </div>
+
+         
+         <!-- Start Of Modal -->
+         <div class="cr-modal">
+            <div class="cr-modal-content">
+               <div class="modal-header">
+                 <h5 class="modal-title" id="exampleModalLabel">View Order Details</h5>
+                 <button type="button" class="close cr-modal-btn" data-dismiss="modal" aria-label="Close">
+                   <span aria-hidden="true">&times;</span>
+                 </button>
+               </div>
+               <div class="modal-body">
+                  <p>Viee order information and update order data</p>
+                  <div class="">
+                     <div class="">
+                        <h5 class="card-title mb-9 fw-semibold">Customer Details</h5>
+                     </div>
+                  </div>
+                  <div class="table-responsive">
+                     <table class="table text-nowrap order-data">
+                        <tbody>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Customer Name:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="customer-name"> </span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Email:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="customer-email"> </span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Phone:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="customer-phone"> </span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Street:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="customer-street"></span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">City:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="customer-city"> </span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">State:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="customer-state"> </span>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+                  <div class="">
+                     <div class="">
+                        <h5 class="card-title mb-9 fw-semibold">Order Details</h5>
+                     </div>
+                  </div>
+                  <div class="table-responsive">
+                     <table class="table text-nowrap order-contents">
+                        <tbody>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Order No:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="order-number"></span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Subtotal:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="order-subtotal"> </span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Total:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="order-total"></span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Amount Paid:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="order-amount-paid"></span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Transaction Reference:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="order-reference"> </span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Payment Channel:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="order-payment-channel"> </span>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td class="border-bottom-0">
+                                 <span class="fw-semibold">Payment Status:</span>
+                              </td>
+                              <td class="border-bottom-0">
+                                 <span class="order-status"> </span>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                 <a class=""><img src="/assets/images/icons/file-edit.svg" />Save changes</a>
+               </div>
+            </div>
+         </div>
+         <!-- End Of Modal -->
+
+
+         <div class="py-6 px-6 text-center">
+            <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank" class="pe-1 text-primary text-decoration-underline">AdminMart.com</a> Distributed by <a href="https://themewagon.com">ThemeWagon</a></p>
+         </div>
+      </div>
+   </div>
+</div>
+<script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+<script src="/assets/libs/axios/axios.js"></script>
+<script src="/assets/js/orders.js"></script>
+<%- include("layout/footer.ejs") %>
+

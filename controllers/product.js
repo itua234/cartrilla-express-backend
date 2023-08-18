@@ -6,40 +6,87 @@ const {Op} = require('sequelize');
 require('dotenv').config();
    
 exports.create = async(req, res) => {
-    const schema = Joi.object({
-        name: Joi.string().required(),
-        brand: Joi.string().required(),
-        stock: Joi.integer(),
-        price: Joi.string().number().required(),
-        description: Joi.required(),
-        shipping_cost: Joi.number().required(),
-        image: Joi.required(),
-        category_id: Joi.integer().required()
-    }).options({abortEarly: false});
-    const { error } = schema.validate(req.body);
-    if(error){
-        res.status(400).json({
-            success: false,
-            errors: error.details[0].message
-        });
-    }
-    const product = await Product.create({
+    const { 
+        name, price, stock, 
+        brand, description, 
+        category_id
+    } = req.body;
 
-    })
+    const product = await Product.create({
+        name, 
+        price, 
+        stock, 
+        brand, 
+        description, 
+        category_id
+    });
+
+    let images = req.files;
+    images.forEach(async(image) => {
+        await ProductImage.create({
+            product_id: product.uuid,
+            url: image.filename
+        });
+    });
+
+    return res.status(200).json({
+        message: "Product Details:",
+        results: product,
+        error: false
+    });
 }
 
-exports.show = async(req, res) => {
-    const schema = Joi.object({
-        id: Joi.required(),
-    }).options({abortEarly: false});
-    const {error, value} = schema.validate(req.params);
-    if(error){
-        return res.status(422).json({
-            message: error.details[0].message,
-            error: error.details
+exports.update = async(req, res) => {
+    const { id } = req.params;
+    var product = await Product.findOne({
+        where: {
+            uuid: id
+        }
+    });
+    if(!product){
+        return res.status(404).json({
+            message: "Product not found",
+            results: null,
+            error: true
         });
     }
-    var { id } = value;
+
+    const params = req.body;
+    const saveData = async () => {
+        Object.keys(params).forEach(async(param) => {
+            if(param != "images"){
+                product[param] = params[param]
+            }
+        });
+        await product.save();
+    }
+    saveData().then(async() => {
+        
+        return res.status(200).json({
+            status: 'success',
+            message: "profile updated successfully",
+            data: newData
+        });
+    });
+
+
+    let images = req.files;
+    images.forEach(async(image) => {
+        await ProductImage.create({
+            product_id: product.uuid,
+            url: image.filename
+        });
+    });
+
+    return res.status(200).json({
+        message: "Product Details:",
+        results: product,
+        error: false
+    });
+}
+
+exports.getProductDetails = async(req, res) => {
+    var { id } = req.params;
     var product = await Product.findOne({
         where: {
             uuid: id
@@ -49,6 +96,11 @@ exports.show = async(req, res) => {
                 model: ProductImage,
                 as: "images",
                 attributes: ['url']
+            },
+            {
+                model: Category,
+                as: "category",
+                attributes: ['id', 'name']
             }
         ],
         raw: false
@@ -68,22 +120,8 @@ exports.show = async(req, res) => {
     }
 }
 
-exports.update = async(req, res) => {
-    
-}
-
-exports.destroy = async(req, res) => {
-    const schema = Joi.object({
-        id: Joi.required(),
-    }).options({abortEarly: false});
-    const {error, value} = schema.validate(req.params);
-    if(error){
-        return res.status(422).json({
-            message: error.details[0].message,
-            error: error.details
-        });
-    }
-    var { id } = value;
+exports.delete = async(req, res) => {
+    var { id } = req.params;
     let product = await Product.findOne({
         where: {
             id
@@ -103,17 +141,20 @@ exports.destroy = async(req, res) => {
             results: null,
             error: true
         });
-    }else{
-        return res.status(200).json({
-            message: "Product Details:",
-            results: product,
-            error: false
-        });
     }
+
+    await product.destroy();
+    await product.images.destroy();
+
+    return res.status(200).json({
+        message: "Product Details:",
+        results: null,
+        error: false
+    });
 }
 
 exports.getCategories = async(req, res) => {
-    const category = await Category.findAll({
+    const categories = await Category.findAll({
         attributes: {
             exclude: ['slug', 'description']
         }
@@ -121,14 +162,18 @@ exports.getCategories = async(req, res) => {
     
     return res.status(200).json({
         message: "Categories:",
-        results: category,
+        results: categories,
         error: false
     });
 }
 
 exports.createCategories = async(req, res) => {
+    const { name, slug, image, description } = req.body;
     const category = await Category.create({
-        
+        name,
+        slug,
+        image,
+        description
     });
     
     return res.status(200).json({
@@ -178,59 +223,8 @@ exports.review = async(req, res) => {
     }
 }
 
-exports.getProducts = async(req, res) => {
-    const schema = Joi.object({
-        categoryId: Joi.required(),
-    }).options({abortEarly: false});
-    const {error, value} = schema.validate(req.params);
-    if(error){
-        return res.status(422).json({
-            message: error.details[0].message,
-            error: error.details
-        });
-    }
-    var { categoryId } = value;
-    let product = await Product.findAll({
-        where: {
-            category_id: categoryId
-        }, 
-        include:[
-            {
-                model: ProductImage,
-                as: "images",
-                attributes: ['id', 'url']
-            }
-        ],
-        raw: false
-    });
-    if(!product){
-        return res.status(404).json({
-            message: "Products not found",
-            results: null,
-            error: true
-        });
-    }else{
-        return res.status(200).json({
-            message: "Product Details:",
-            results: product,
-            error: false
-        });
-    }
-}
-
 exports.getSimilarProducts = async(req, res) => {
-    const schema = Joi.object({
-        productId: Joi.required(),
-        categoryId: Joi.required(),
-    }).options({abortEarly: false});
-    const {error, value} = schema.validate(req.params);
-    if(error){
-        return res.status(422).json({
-            message: error.details[0].message,
-            error: error.details
-        });
-    }
-    var { categoryId, productId } = value;
+    var { categoryId, productId } = req.params;
     let products = await Product.findAll({
         where: {
             category_id: categoryId,
@@ -253,15 +247,21 @@ exports.getSimilarProducts = async(req, res) => {
     });
 }
 
-exports.FetchAllStoreProducts = async(req, res) => {
+exports.getAllProducts = async(req, res) => {
     let products = await Product.findAll({ 
         include:[
             {
                 model: ProductImage,
                 as: "images",
                 attributes: ['url']
+            },
+            {
+                model: Category,
+                as: "category",
+                attributes: ['id', 'name']
             }
         ],
+        limit: 10,
         raw: false
     });
     
@@ -277,18 +277,7 @@ exports.FetchTrendingProducts = async(req, res) => {
 }
 
 exports.FetchProductsByPrice = async(req, res) => {
-    const schema = Joi.object({
-        min: Joi.required(),
-        max: Joi.required()
-    }).options({abortEarly: false});
-    const {error, value} = schema.validate(req.params);
-    if(error){
-        return res.status(422).json({
-            message: error.details[0].message,
-            error: error.details
-        });
-    }
-    var { min, max } = value;
+    var { min, max } = req.params;
     let products = await Product.findAll({ 
         where: {
             price: {
@@ -373,6 +362,5 @@ exports.createTestProducts = async(req, res) => {
         res.send(e);
     })
     request.end();
-
 }
 
