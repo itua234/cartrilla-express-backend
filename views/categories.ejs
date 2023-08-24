@@ -1,0 +1,66 @@
+<%- include("layout/header.ejs") %>
+    <div class="container-fluid" style="background-color:#F5F6FA">
+        <!--  Row 1 -->
+        <div class="row mb-3">
+            <div class="col">
+                <div class="">
+                    <h5 class="card-title mb-9 fw-semibold">Categories</h5>
+                </div>
+                <select class="form-control" id="all-categories">
+                    
+                </select>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                <div class="">
+                    <h5 class="card-title mb-9 fw-semibold">Add New Category</h5>
+                    <span class="message d-block" style="text-align:center;color:green;"></span>
+                </div>
+                <form id="create-category" action="/api/v1/category" method="POST">
+                    <div class="mb-3">
+                        <label for="">Name</label>
+                        <input type="text" class="form-control" name="name">
+                        <span class="error"> </span>
+                    </div>
+                    <!--<input type="text" name="slug">
+                    <input type="text" name="description">
+                    <input type="file" name="image">-->
+                    <button type="submit" class="btn btn-primary">
+                        <img src="/assets/images/icons/plus.svg" />
+                        <span>Add Category</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!--  End of Row 1 -->
+    </div>
+
+  </div>
+</div>
+<script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+<script src="/assets/libs/axios/axios.js"></script>
+<script src="/assets/js/categories.js"></script>
+<script src="/assets/js/socket.js"></script>
+<script>
+  var socket = io();
+  //const socket = io("https://server-domain.com");
+
+  $(function () {
+    //alert("softeh");
+    //socket.emit("ping", {"name": "softech"});
+  });
+
+  socket.on("connect", function () {
+    console.log("connected to server"); // true
+    socket.on("ping", (data) => {
+      alert(JSON.stringify(data));
+    });
+  });
+
+  socket.on("disconnect", function () {
+    console.log("disconnected from server"); // true
+  });
+</script>
+<%- include("layout/footer.ejs") %>
+

@@ -22,7 +22,11 @@ const {
 } = require('../schemas/user');
 
 const { orderSchema } = require('../schemas/order');
-const { createProductSchema } = require('../schemas/product');
+const { 
+    createProductSchema, 
+    updateProductSchema , 
+    createCategorySchema
+} = require('../schemas/product');
 
 const multer = require('multer');
 const upload = multer({
@@ -76,7 +80,7 @@ router.route('/product')
 
 router.route('/product/:id')
 .get(product.getProductDetails)
-.post([upload.array('images')], product.update)
+.post([upload.array('images')], updateProductSchema, product.update)
 .delete(product.delete);
 
 router.get('/product/:productId/:categoryId', product.getSimilarProducts);
@@ -85,7 +89,7 @@ router.get('/product/:min/:max', product.FetchProductsByPrice);
 
 router.route('/category')
 .get(product.getCategories)
-.post(product.createCategories);
+.post(createCategorySchema, product.createCategories);
 
 router.route('/order')
 .get(isAuthenticated, order.getUserOrders)

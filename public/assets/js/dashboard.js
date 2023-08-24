@@ -7,13 +7,14 @@ $(function () {
       var chart = {
       series: [
          { name: "Orders", data: [] },
-         { name: "Revenues", data: [] }
+         //{ name: "Revenues", data: [] }
       ],
       chart: {
          type: "line",
          height: 345,
          foreColor: "#adb0bb",
-         fontFamily: 'inherit'
+         fontFamily: 'inherit',
+         offsetX: -15,
       },
       colors: ["#5D87FF", "#49BEFF"],
       grid: {
@@ -59,7 +60,7 @@ $(function () {
       let details = res.data.results;
       chart.updateSeries([
          { name: "Orders", data: details.order },
-         { name: "Revenues", data: details.revenue }
+         //{ name: "Revenues", data: details.revenue }
       ]);
    });
 

@@ -273,7 +273,7 @@ exports.getProducts = async(req, res) => {
             });  
         break;
         case "all":
-            const pageSize = 5;
+            const pageSize = 10;
             const offset = (page - 1) * pageSize;
             let products = await Product.findAll({ 
                 include:[
@@ -290,6 +290,7 @@ exports.getProducts = async(req, res) => {
                 ],
                 limit: pageSize,
                 offset: offset,
+                order: [['createdAt', 'DESC']],
                 raw: false
             });
             
@@ -359,15 +360,15 @@ exports.getOrder = async(req, res) => {
 }
 
 exports.dashboard = async(req, res) => {
-    const user = req.session.user;
+    /*const user = req.session.user;
     let admin = await Admin.findOne({
         where: {
             email: req.session.user.email
         },
         raw: true
-    });
+    });*/
    
-    res.render('index', { admin: admin });
+    res.render('index', { admin: "gdgdgdg" });
 }
 
 exports.order = (req, res) => {
@@ -380,6 +381,10 @@ exports.product = (req, res) => {
 
 exports.customer = (req, res) => {
     res.render('customers');
+}
+
+exports.category = (req, res) => {
+    res.render('categories');
 }
 
 exports.test = async(req, res) => {
@@ -423,7 +428,7 @@ exports.getUsers = async(req, res) => {
         pages = Math.ceil(totalCount / pageSize);
     }
     return res.status(200).json({
-        message: "Products:",
+        message: "Users:",
         results: users,
         pages: pages,
         error: false

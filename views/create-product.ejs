@@ -1,0 +1,75 @@
+<div class="cr-sidebar-box">
+    <div class="cr-sidebar scroll-sidebar" data-simplebar="">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-6">
+                <h5 class="card-title fw-semibold">New Product</h5>
+                <img src="/assets/images/icons/close.svg" class="close-icon"/>
+            </div>
+            <p>Add information and add new product</p>
+            <span class="message d-block" style="text-align:center;color:green;"></span>
+            <div>
+                <form enctype="multipart/form-data" action="/api/v1/product" method="POST" id="create-product">
+                    <div class="mb-3">
+                        <label class="form-label">
+                        Product Name</label>
+                        <input type="text" class="form-control" name="name" id="name">
+                        <span class="error"> </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                        Regular Price</label>
+                        <input type="number" class="form-control" name="price" id="price">
+                        <span class="error"> </span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                        Stock</label>
+                        <input type="number" class="form-control" name="stock" id="stock">
+                        <span class="error"> </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                        Brand</label>
+                        <input type="text" class="form-control" name="brand" id="brand">
+                        <span class="error"> </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                        Category</label>
+                        <select name="category_id" class="form-control" id="category">
+                            <option>Choose a category</option>
+                        </select>
+                        <span class="error"> </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                        Description</label>
+                        <textarea class="form-control" name="description" id="description"></textarea>
+                        <span class="error"> </span>
+                    </div>
+
+                    <!--<div class="mb-3 preview-file">
+                        
+                    </div>-->
+
+                    <div class="mb-3">
+                        <label class="file-label d-flex align-items-center justify-content-center" for="images">
+                            <img src="/assets/images/icons/upload.svg" />Choose Files To Upload
+                        </label>
+                        <input type="file" class="form-control" name="images" id="images" multiple>
+                        <span class="error"> </span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" data-id="" data-action="">
+                        <img src="/assets/images/icons/plus.svg" />
+                    <span>Submit</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

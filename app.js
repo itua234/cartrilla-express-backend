@@ -88,6 +88,7 @@ function useRoutes() {
     app.get('/dashboard/orders', [isAdminAuth], admin.order);
     app.get('/dashboard/products', [isAdminAuth], admin.product);
     app.get('/dashboard/customers', [isAdminAuth], admin.customer);
+    app.get('/dashboard/categories', [isAdminAuth], admin.category);
 
     app.route('/login')
     .get(function(req, res){

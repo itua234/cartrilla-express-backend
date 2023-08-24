@@ -9,7 +9,7 @@ exports.create = async(req, res) => {
     const { 
         name, price, stock, 
         brand, description, 
-        category_id
+        category_id, images
     } = req.body;
 
     const product = await Product.create({
@@ -20,17 +20,16 @@ exports.create = async(req, res) => {
         description, 
         category_id
     });
-
-    let images = req.files;
+    
     images.forEach(async(image) => {
         await ProductImage.create({
             product_id: product.uuid,
-            url: image.filename
+            url: "/images/uploads/" + image.filename
         });
     });
 
     return res.status(200).json({
-        message: "Product Details:",
+        message: "new product has been added",
         results: product,
         error: false
     });
@@ -60,28 +59,23 @@ exports.update = async(req, res) => {
         });
         await product.save();
     }
-    saveData().then(async() => {
-        
+
+    saveData().then(() => {
+        let images = params["images"];
+        if(images.length !== 0){
+            images.forEach(async(image) => {
+                await ProductImage.create({
+                    product_id: product.uuid,
+                    url: "/images/uploads/" + image.filename
+                });
+            });
+        }
+
         return res.status(200).json({
-            status: 'success',
-            message: "profile updated successfully",
-            data: newData
+            message: "product details has been updated",
+            results: product,
+            error: false
         });
-    });
-
-
-    let images = req.files;
-    images.forEach(async(image) => {
-        await ProductImage.create({
-            product_id: product.uuid,
-            url: image.filename
-        });
-    });
-
-    return res.status(200).json({
-        message: "Product Details:",
-        results: product,
-        error: false
     });
 }
 
@@ -124,16 +118,8 @@ exports.delete = async(req, res) => {
     var { id } = req.params;
     let product = await Product.findOne({
         where: {
-            id
-        }, 
-        include:[
-            {
-                model: ProductImage,
-                as: "images",
-                attributes: ['id', 'url']
-            }
-        ],
-        raw: false
+            uuid: id
+        }
     });
     if(!product){
         return res.status(404).json({
@@ -142,12 +128,16 @@ exports.delete = async(req, res) => {
             error: true
         });
     }
-
+    
+    await ProductImage.destroy({
+        where: {
+            product_id: product.uuid
+        }
+    });
     await product.destroy();
-    await product.images.destroy();
 
     return res.status(200).json({
-        message: "Product Details:",
+        message: "product has been deleted",
         results: null,
         error: false
     });
@@ -156,8 +146,9 @@ exports.delete = async(req, res) => {
 exports.getCategories = async(req, res) => {
     const categories = await Category.findAll({
         attributes: {
-            exclude: ['slug', 'description']
-        }
+            exclude: ['slug', 'description', 'image']
+        },
+        //order: [["name", "DESC"]]
     });
     
     return res.status(200).json({
@@ -168,32 +159,26 @@ exports.getCategories = async(req, res) => {
 }
 
 exports.createCategories = async(req, res) => {
-    const { name, slug, image, description } = req.body;
-    const category = await Category.create({
-        name,
-        slug,
-        image,
-        description
-    });
+    const params = req.body;
+    const category = Category.build({});
     
-    return res.status(200).json({
-        message: "Categories:",
-        results: category,
-        error: false
+    const saveData = async () => {
+        Object.keys(params).forEach(async(param) => {
+            category[param] = params[param];
+        });
+        await category.save();
+    }
+
+    saveData().then(() => {
+        return res.status(200).json({
+            message: "a new category has been created",
+            results: category,
+            error: false
+        });
     });
 }
 
 exports.review = async(req, res) => {
-    const schema = Joi.object({
-        categoryId: Joi.required(),
-    }).options({abortEarly: false});
-    const {error, value} = schema.validate(req.params);
-    if(error){
-        return res.status(422).json({
-            message: error.details[0].message,
-            error: error.details
-        });
-    }
     var { categoryId } = value;
     let product = await Product.findAll({
         where: {

@@ -65,7 +65,7 @@ $(function () {
           $(".cr-all-orders tbody").empty();
           users.forEach(function(user){
              $(".cr-all-orders tbody").append(`
-               <tr>
+                <tr>
                     <td class="border-bottom-0">
                         <div class="user-card">
                             <div class="user-avatar sm ${colors[Math.floor(Math.random() * 4)]}">
@@ -74,13 +74,13 @@ $(function () {
                                 </span>
                             </div>
                             <div class="user-name">
-                                    <h6 class="fw-semibold mb-1">${user.firstname +" "+ user.lastname}</h6>
-                                    <span class="fw-normal tb-leadsss">${user.email}</span>                          
+                                <h6 class="fw-semibold mb-1">${user.firstname +" "+ user.lastname}</h6>
+                                <span class="fw-normal tb-leadsss">${user.email}</span>                          
                             </div>
                         </div>                        
                     </td>
                     <td class="border-bottom-0">
-                        <span class="">${user.phone} <span>NGN</span></span>
+                        <span class="">${user.phone} NGN</span>
                     </td>
                     <td class="border-bottom-0">
                         <div class="d-flex align-items-center gap-2">
@@ -92,7 +92,7 @@ $(function () {
                             <img src="/assets/images/icons/eye.svg" />
                         </a>
                     </td>
-               </tr>  
+                </tr>  
              `);
           })
        });

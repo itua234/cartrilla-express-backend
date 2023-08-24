@@ -76,14 +76,17 @@ const multer = require('multer');
 //export the schemas
 module.exports = {
     createProductSchema: async(req, res, next) => {
+        req.body.images = req.files || [];
         const v = new niv.Validator(req.body, {
             name: 'required|string',
             brand: 'required|string',
             stock: 'required|integer',
             price: 'required|integer',
             description: 'required|string',
-            category_id: 'required|integer'
-        });
+            category_id: 'required|integer',
+            images: 'required|array',
+           "images.*": 'required|mime:jpeg,jpg,svg,png|size:2mb'
+        }, {'category_id.integer': "The category field is required"});
 
         let matched = await v.check();
         if(!matched){
@@ -97,8 +100,51 @@ module.exports = {
             req.body = v.inputs;
             next();
         }
-
     },
+    updateProductSchema: async(req, res, next) => {
+        req.body.images = req.files || [];
+        const v = new niv.Validator(req.body, {
+            name: 'required|string',
+            brand: 'required|string',
+            stock: 'required|integer',
+            price: 'required|integer',
+            description: 'required|string',
+            category_id: 'required|integer',
+            images: 'array',
+           "images.*": 'mime:jpeg,jpg,svg,png|size:2mb'
+        }, {'category_id.integer': "The category field is required"});
 
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "failed to update product");
+        }else{
+            if(!req.value){
+                req.value = {}
+            }
+
+            req.body = v.inputs;
+            next();
+        }
+    },
+    createCategorySchema: async(req, res, next) => {
+        //req.body.images = req.files || [];
+        const v = new niv.Validator(req.body, {
+            name: 'required|string'   
+        });
+
+        let matched = await v.check();
+        if(!matched){
+            let errors = v.errors;
+            returnValidationError(errors, res, "failed to create new category");
+        }else{
+            if(!req.value){
+                req.value = {}
+            }
+
+            req.body = v.inputs;
+            next();
+        }
+    },
 
 }
