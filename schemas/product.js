@@ -3,6 +3,8 @@ const {Op} = require('sequelize');
 const {QueryTypes} = require('sequelize');
 const {returnValidationError} = require("../util/helper");
 const { auth } = require("../middleware/auth") ;
+const fs = require("fs");
+const path = require("path");
 
 const niv = require('node-input-validator');
 niv.extend('hasSpecialCharacter', ({value}) => {
@@ -91,6 +93,20 @@ module.exports = {
         let matched = await v.check();
         if(!matched){
             let errors = v.errors;
+            let images = req.body.images;
+            if(images.length !== 0){
+                images.forEach(async(image) => {
+                    //url: "/images/uploads/" + image.filename
+                    const filename = image.filename;
+                    const filePath = path.join(__dirname, "..", "public", "images", "uploads", filename);
+
+                    //Check if the file exists
+                    if(fs.existsSync(filePath)){
+                        //Delete the file
+                        fs.unlinkSync(filePath);
+                    }
+                });
+            }
             returnValidationError(errors, res, "failed to add new product");
         }else{
             if(!req.value){
@@ -117,6 +133,20 @@ module.exports = {
         let matched = await v.check();
         if(!matched){
             let errors = v.errors;
+            let images = req.body.images;
+            if(images.length !== 0){
+                images.forEach(async(image) => {
+                    //url: "/images/uploads/" + image.filename
+                    const filename = image.filename;
+                    const filePath = path.join(__dirname, "..", "public", "images", "uploads", filename);
+
+                    //Check if the file exists
+                    if(fs.existsSync(filePath)){
+                        //Delete the file
+                        fs.unlinkSync(filePath);
+                    }
+                });
+            }
             returnValidationError(errors, res, "failed to update product");
         }else{
             if(!req.value){

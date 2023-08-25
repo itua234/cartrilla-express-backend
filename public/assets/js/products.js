@@ -286,4 +286,25 @@ $(function () {
       createProduct(url, formData);
    });
 
+   $("#images").change(function(event){
+      $("#imagePreviewBox").empty();
+      var inputs = event.target.files;
+      var filesAmount = inputs.length;
+      $("#totalImages span").text(inputs.length);
+      
+      for(let i=0; i<filesAmount; i++){
+         var reader = new FileReader();
+         //convert each image file to a string
+         reader.readAsDataURL(inputs[i]);
+
+         //fileReader will emit the load event when the dataURL is ready
+         //Access the string using reader.result inside the callback function
+         reader.onload = function(e){
+            $("#imagePreviewBox").append(`
+               <img src=${e.target.result} style="height:60px;width:60px;margin-right:15px;">
+            `);
+         }
+      }
+   })
+
 })

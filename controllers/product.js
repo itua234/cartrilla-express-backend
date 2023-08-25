@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const { sequelize, models: { User, Product, ProductImage, Category } } = require('../models');
 const http = require('https');
 const {Op} = require('sequelize');
+const fs = require("fs");
+const path = require("path");
 require('dotenv').config();
    
 exports.create = async(req, res) => {
@@ -129,11 +131,27 @@ exports.delete = async(req, res) => {
         });
     }
     
-    await ProductImage.destroy({
+    let images = await ProductImage.findAll({
         where: {
             product_id: product.uuid
         }
     });
+    
+    if(images.length !== 0){
+        images.forEach(async(image) => {
+            await image.destroy();
+            //url: "/images/uploads/" + image.filename
+            const filename = image.url.slice(16);
+            const filePath = path.join(__dirname, "..", "public", "images", "uploads", filename);
+
+            //Check if the file exists
+            if(fs.existsSync(filePath)){
+                //Delete the file
+                fs.unlinkSync(filePath);
+            }
+        });
+    }
+
     await product.destroy();
 
     return res.status(200).json({
