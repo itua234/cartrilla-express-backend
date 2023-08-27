@@ -620,3 +620,57 @@ span.error, span.message{
 .file-label img{
     margin-right:10px;
 }
+
+
+
+
+#removePreview{
+    position:absolute;
+    top:-10px;
+    right:-10px;
+    border:2px solid #EBEEF2;
+    background-color: #EBEEF2;
+    height:20px;
+    width:20px;
+    border-radius:50%;
+    display:flex;
+    display:-webkit-flex;
+    align-items:center;
+    -webkit-align-items:center;
+    justify-content:center;
+    -webkit-justify-content:center;
+    cursor:pointer;
+}
+#removePreviousImage{
+    position:absolute;
+    top:-10px;
+    right:-10px;
+    border:2px solid #EBEEF2;
+    background-color: #EBEEF2;
+    height:20px;
+    width:20px;
+    border-radius:50%;
+    display:flex;
+    display:-webkit-flex;
+    align-items:center;
+    -webkit-align-items:center;
+    justify-content:center;
+    -webkit-justify-content:center;
+    cursor:pointer;
+}
+#oldImagePreviewBox{
+    flex-wrap: wrap;
+    -webkit-flex-wrap:wrap
+}
+#oldImagePreviewBox div{
+    margin-bottom:20px;
+}
+
+#imagePreviewBox{
+    flex-wrap: wrap;
+    -webkit-flex-wrap:wrap
+}
+#imagePreviewBox div{
+    margin-bottom:20px;
+}
+

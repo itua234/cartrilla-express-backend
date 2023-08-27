@@ -91,7 +91,7 @@ exports.getProductDetails = async(req, res) => {
             {
                 model: ProductImage,
                 as: "images",
-                attributes: ['url']
+                attributes: ['id','url']
             },
             {
                 model: Category,
@@ -156,6 +156,39 @@ exports.delete = async(req, res) => {
 
     return res.status(200).json({
         message: "product has been deleted",
+        results: null,
+        error: false
+    });
+}
+
+exports.deleteProductImage = async(req, res) => {
+    var { id } = req.params;
+    let image = await ProductImage.findOne({
+        where: {
+            id: id
+        }
+    });
+    if(!image){
+        return res.status(404).json({
+            message: "Image not found",
+            results: null,
+            error: true
+        });
+    }
+    
+    await image.destroy();
+    //url: "/images/uploads/" + image.filename
+    const filename = image.url.slice(16);
+    const filePath = path.join(__dirname, "..", "public", "images", "uploads", filename);
+
+    //Check if the file exists
+    if(fs.existsSync(filePath)){
+        //Delete the file
+        fs.unlinkSync(filePath);
+    }
+
+    return res.status(200).json({
+        message: "image has been deleted",
         results: null,
         error: false
     });

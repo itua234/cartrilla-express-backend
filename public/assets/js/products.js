@@ -105,6 +105,7 @@ $(function () {
          axios.get(`${baseUrl}/product/${id}`)
          .then((res) => {
             let data = res.data.results;
+            let images = data.images;
             var btn = $("#create-product button[type='submit']");
             btn.data("id", data.uuid);
             btn.data("action", "update");
@@ -115,6 +116,16 @@ $(function () {
             $(".cr-sidebar form select[name='category_id']").val(data.category.id);
             $(".cr-sidebar form textarea[name='description']").val(data.description);
             $(".cr-sidebar").css("right", "0px");
+            images.forEach(function(image){
+               $("#oldImagePreviewBox").append(`
+                  <div style="position:relative;margin-right:25px;">
+                     <img src=${image.url} style="height:60px;width:60px;">
+                     <span id="removePreviousImage" data-id=${image.id}>
+                     x
+                     </span>
+                  </div>
+               `);
+            })
          });
       });
    });
@@ -199,6 +210,10 @@ $(function () {
       var btn = $("#create-product button[type='submit']");
       btn.data("id", "");
       btn.data("action", "");
+
+      $("#imagePreviewBox").empty();
+      $("#oldImagePreviewBox").empty();
+      $("#totalImages span").text(0);
    });
 
    //Validate price and stock input field (allow only numbers)
@@ -286,6 +301,7 @@ $(function () {
       createProduct(url, formData);
    });
 
+   //Preview the images before uploading
    $("#images").change(function(event){
       $("#imagePreviewBox").empty();
       var inputs = event.target.files;
@@ -301,10 +317,48 @@ $(function () {
          //Access the string using reader.result inside the callback function
          reader.onload = function(e){
             $("#imagePreviewBox").append(`
-               <img src=${e.target.result} style="height:60px;width:60px;margin-right:15px;">
+               <div style="position:relative;margin-right:25px;">
+                  <img src=${e.target.result}  style="height:60px;width:60px;">
+                  <span id="removePreview" data-name=${inputs[i].name}>
+                  x
+                  </span>
+               </div>
             `);
          }
       }
-   })
+   });
+
+   $(document).on("click", "#removePreview", function(event){
+      //event.preventDefault();
+      const filteredFiles = new DataTransfer();
+      const fileName = $(this).data("name");
+      let files = $("#images").prop("files");
+      
+      for(var i=0; i<files.length; i++){
+         if(files[i].name !== fileName){
+            filteredFiles.items.add(files[i]); //here you exclude the file. thus removing it.
+         }
+      }
+
+      //update the input with the new filelist;
+      $("#images").prop("files", filteredFiles.files);  //Assign the updates list
+      $("#totalImages span").text(filteredFiles.files.length);
+      $(this).parent().remove();
+   });
+
+   //Delete product image
+   $(document).on("click", "#removePreviousImage", function(event){
+      //event.preventDefault();
+      var btn = $(this);
+      const imageId = $(this).data("id");
+      axios.delete(`${baseUrl}/product/image/${imageId}`)
+      .then((res) => {
+         btn.parent().remove();
+      })
+      .catch(function(error){
+         //let errors = error.response.data.error;
+      });
+      
+   });
 
 })

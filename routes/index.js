@@ -80,8 +80,11 @@ router.route('/product')
 
 router.route('/product/:id')
 .get(product.getProductDetails)
-.post([upload.array('images')], updateProductSchema, product.update)
+.post([upload.array('images'), updateProductSchema], product.update)
 .delete(product.delete);
+
+router.route('/product/image/:id')
+.delete(product.deleteProductImage);
 
 router.get('/product/:productId/:categoryId', product.getSimilarProducts);
 router.get('/product/trending', product.FetchTrendingProducts);

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const routes = require('./routes/index');
@@ -39,6 +40,18 @@ app.use(session({
     }
 }));
 app.use(cookieParser());
+//Custom error handler for multer "Too many files" error
+/*app.use((err, req, res, next) => {
+    if(err instanceof multer.MulterError){
+        console.log("Too many files. Max allowed: 5 files");
+    }else{
+        next(err);
+    }
+})
+//Generic error handler
+app.use((err, req, res, next) => {
+    console.log(err);
+});*/
 
 require('dotenv').config();
 const PORT = process.env.PORT || 8080; 
